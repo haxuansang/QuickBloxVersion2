@@ -39,8 +39,6 @@ public class ChatDialogsAdapter extends BaseAdapter {
     public View getView(int i, View convertView, ViewGroup viewGroup) {
         View view = convertView;
         if (convertView == null) {
-
-
         view = LayoutInflater.from(context).inflate(R.layout.chatdialog, viewGroup, false);
         TextView tvTitle, tvMessage;
         tvTitle = (TextView) view.findViewById(R.id.inflateTitle);

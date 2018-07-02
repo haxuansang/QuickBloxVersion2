@@ -7,10 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.sang.chattingdemo.common.Common;
+import com.example.sang.chattingdemo.common.holder.QBUserHolder;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.session.BaseService;
 import com.quickblox.auth.session.QBSession;
@@ -22,6 +25,7 @@ import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -34,7 +38,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         Bundle bundleUser= intent.getBundleExtra("PackageUser");
         username=bundleUser.getString("username");
         password=bundleUser.getString("password");
@@ -51,14 +55,41 @@ public class ChatActivity extends AppCompatActivity {
                 startActivity(newIntent);
             }
         });
+        lvChatting.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                QBChatDialog qbChatDialog = (QBChatDialog)lvChatting.getAdapter().getItem(i);
+                Intent intent1 = new Intent(ChatActivity.this,ChatMessageActivity.class);
+                intent1.putExtra(Common.DIALOG_EXTRA,qbChatDialog);
+                startActivity(intent1);
+            }
+        });
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadChatDialogs();
+    }
+
     private void createSessionForChat()
     {
         final ProgressDialog progressDialog  = new ProgressDialog(this);
         progressDialog.setMessage("Please Waiting...");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
+        QBUsers.getUsers(null).performAsync(new QBEntityCallback<ArrayList<QBUser>>() {
+            @Override
+            public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {
+                QBUserHolder.getInstance().putUsers(qbUsers);
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+
+            }
+        });
         final QBUser qbUser = new QBUser(username,password);
         QBAuth.createSession(qbUser).performAsync(new QBEntityCallback<QBSession>() {
             @Override
