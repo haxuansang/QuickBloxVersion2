@@ -1,15 +1,35 @@
 package com.example.sang.chattingdemo;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.session.BaseService;
+import com.quickblox.auth.session.QBSession;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBRestChatService;
+import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.BaseServiceException;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.request.QBRequestBuilder;
+import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.users.model.QBUser;
+
+import java.util.ArrayList;
 
 public class ChatActivity extends AppCompatActivity {
     String username,password;
     FloatingActionButton btnAddChat;
+    ListView lvChatting;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,11 +41,74 @@ public class ChatActivity extends AppCompatActivity {
         Toast.makeText(this, username, Toast.LENGTH_SHORT).show();
         Toast.makeText(this, password, Toast.LENGTH_SHORT).show();
         btnAddChat=(FloatingActionButton)findViewById(R.id.addChatButton);
+        lvChatting=(ListView)findViewById(R.id.lvChatting);
         createSessionForChat();
+        loadChatDialogs();
+        btnAddChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent newIntent= new Intent(ChatActivity.this,ListUserActivity.class);
+                startActivity(newIntent);
+            }
+        });
 
     }
     private void createSessionForChat()
     {
+        final ProgressDialog progressDialog  = new ProgressDialog(this);
+        progressDialog.setMessage("Please Waiting...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+        final QBUser qbUser = new QBUser(username,password);
+        QBAuth.createSession(qbUser).performAsync(new QBEntityCallback<QBSession>() {
+            @Override
+                public void onSuccess(QBSession qbSession, Bundle bundle) {
 
+                    qbUser.setId(qbSession.getUserId());
+                try {
+                    qbUser.setPassword(BaseService.getBaseService().getToken());
+                } catch (BaseServiceException e) {
+                    e.printStackTrace();
+                }
+                QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
+                        @Override
+                        public void onSuccess(Object o, Bundle bundle) {
+                            progressDialog.dismiss();
+                        }
+
+
+                        @Override
+                        public void onError(QBResponseException e) {
+                            Log.e("Error",""+e.getMessage());
+                        }
+                    });
+                }
+
+            @Override
+            public void onError(QBResponseException e) {
+
+            }
+        });
+
+    }
+    private  void loadChatDialogs()
+    {
+        QBRequestGetBuilder requestGetBuilder = new QBRequestGetBuilder();
+        requestGetBuilder.setLimit(100);
+        QBRestChatService.getChatDialogs(null,requestGetBuilder).performAsync(new QBEntityCallback<ArrayList<QBChatDialog>>() {
+            @Override
+            public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
+                        ChatDialogsAdapter chatDialogsAdapter = new ChatDialogsAdapter(qbChatDialogs,ChatActivity.this);
+                        lvChatting.setAdapter(chatDialogsAdapter);
+                        chatDialogsAdapter.notifyDataSetChanged();
+
+
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                Log.e("onError", "onError: "+e.getMessage() );
+            }
+        });
     }
 }
