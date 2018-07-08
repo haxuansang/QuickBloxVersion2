@@ -3,6 +3,8 @@ package com.example.sang.chattingdemo;
 import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,24 +31,24 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import org.jivesoftware.smack.SmackException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChatMessageActivity extends AppCompatActivity {
     QBChatDialog qbChatDialog;
-    ListView lvChatting;
+    RecyclerView lvChatting;
     ImageButton btnsendMessage;
     TextView contentMessage;
     ChatMessageAdapter adapter;
-    ArrayList<QBChatMessage> qbChatMessagesArray;
+    List<QBChatMessage> qbChatMessagesArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_message);
-        lvChatting=(ListView)findViewById(R.id.lvChatting);
         initView();
-
+        qbChatMessagesArray=new ArrayList<QBChatMessage>();
         retrieveMessages();
-       // initChatDilalog();
+
 
         btnsendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,26 +66,34 @@ public class ChatMessageActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 contentMessage.setText("");
                 contentMessage.setFocusable(true);
-
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initChatDilalog();
     }
 
     private void retrieveMessages() {
         qbChatDialog=(QBChatDialog)getIntent().getSerializableExtra(Common.DIALOG_EXTRA);
         qbChatDialog.initForChat(QBChatService.getInstance());
         QBMessageGetBuilder qbMessageGetBuilder = new QBMessageGetBuilder();
-        qbMessageGetBuilder.setLimit(500);
+        qbMessageGetBuilder.setLimit(100);
         if(qbChatDialog!=null)
         {
             QBRestChatService.getDialogMessages(qbChatDialog,qbMessageGetBuilder).performAsync(new QBEntityCallback<ArrayList<QBChatMessage>>() {
                 @Override
                 public void onSuccess(ArrayList<QBChatMessage> qbChatMessages, Bundle bundle) {
-                   qbChatMessagesArray=qbChatMessages;
+                    for (QBChatMessage  qbChatMessage: qbChatMessages
+                         ) {
+                        qbChatMessagesArray.add(qbChatMessage);
+                    }
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(ChatMessageActivity.this);
                     adapter = new ChatMessageAdapter(ChatMessageActivity.this,qbChatMessagesArray);
+                    lvChatting.setLayoutManager(layoutManager);
                     lvChatting.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-
                 }
 
                 @Override
@@ -94,6 +104,8 @@ public class ChatMessageActivity extends AppCompatActivity {
         }
         else
             Toast.makeText(this, "nulll roi", Toast.LENGTH_SHORT).show();
+
+
     }
 
     private void initChatDilalog() {
@@ -116,9 +128,6 @@ public class ChatMessageActivity extends AppCompatActivity {
             public void processMessage(String s, QBChatMessage qbChatMessage, Integer integer) {
                 qbChatMessagesArray.add(qbChatMessage);
                 adapter.notifyDataSetChanged();
-
-
-
             }
 
             @Override
@@ -129,7 +138,7 @@ public class ChatMessageActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        lvChatting = (ListView)findViewById(R.id.lvChatMain);
+        lvChatting = (RecyclerView) findViewById(R.id.list_chat_messages);
         btnsendMessage = (ImageButton) findViewById(R.id.sendMessage);
         contentMessage =(EditText)findViewById(R.id.content_message);
 

@@ -1,6 +1,7 @@
 package com.example.sang.chattingdemo;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,51 +15,99 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatMessage;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ChatMessageAdapter extends BaseAdapter {
-    Context context;
-    ArrayList<QBChatMessage> qbChatMessages;
+public class ChatMessageAdapter extends RecyclerView.Adapter {
+    private static final int VIEW_TYPE_MESSAGE_SENT = 1;
+    private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
-    public ChatMessageAdapter(Context context, ArrayList<QBChatMessage> qbChatMessages) {
-        this.context = context;
-        this.qbChatMessages = qbChatMessages;
+    private Context mContext;
+    private List<QBChatMessage> mMessageList;
+    Integer userID;
+
+    public ChatMessageAdapter(Context context, List<QBChatMessage> messageList) {
+        mContext = context;
+        mMessageList = messageList;
+        userID = QBChatService.getInstance().getUser().getId();
+
     }
 
     @Override
-    public int getCount() {
-        return qbChatMessages.size();
+    public int getItemCount() {
+        return mMessageList.size();
     }
 
+    // Determines the appropriate ViewType according to the sender of the message.
     @Override
-    public Object getItem(int i) {
-        return qbChatMessages.get(i);
-    }
+    public int getItemViewType(int position) {
 
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
 
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        View convertView = view;
-        if (view==null){
-            if(qbChatMessages.get(i).getSenderId().equals(QBChatService.getInstance().getUser().getId())) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.list_send_messages,viewGroup,false);
-                BubbleTextView bubbleTextView = (BubbleTextView)convertView.findViewById(R.id.idmessend);
-                bubbleTextView.setText(qbChatMessages.get(i).getBody());
-                Log.e("asd","send");
-            }
-            else
-            {
-                convertView = LayoutInflater.from(context).inflate(R.layout.list_receive_messages,viewGroup,false);
-                TextView textView =(TextView)convertView.findViewById(R.id.message_user);
-                textView.setText(QBUserHolder.getInstance().getUserById(qbChatMessages.get(i).getSenderId()).getFullName());
-                BubbleTextView bubbleTextView = (BubbleTextView)convertView.findViewById(R.id.idmesreceive);
-                bubbleTextView.setText(qbChatMessages.get(i).getBody());
-                Log.e("asd","receive");
-            }
+        if (mMessageList.get(position).getSenderId().equals(userID)) {
+            // If the current user is the sender of the message
+            return VIEW_TYPE_MESSAGE_SENT;
+        } else {
+            // If some other user sent the message
+            return VIEW_TYPE_MESSAGE_RECEIVED;
         }
-        return convertView;
+    }
+
+    // Inflates the appropriate layout according to the ViewType.
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
+
+        if (viewType == VIEW_TYPE_MESSAGE_SENT) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_send_messages, parent, false);
+            return new SentMessageHolder(view);
+        } else if (viewType == VIEW_TYPE_MESSAGE_RECEIVED) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_receive_messages, parent, false);
+            return new ReceivedMessageHolder(view);
+        }
+
+        return null;
+    }
+
+    // Passes the message object to a ViewHolder so that the contents can be bound to UI.
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+
+        switch (holder.getItemViewType()) {
+            case VIEW_TYPE_MESSAGE_SENT:
+                ((SentMessageHolder) holder).bind(mMessageList.get(position));
+                break;
+            case VIEW_TYPE_MESSAGE_RECEIVED:
+                ((ReceivedMessageHolder) holder).bind(mMessageList.get(position));
+        }
+    }
+
+    private class SentMessageHolder extends RecyclerView.ViewHolder {
+        BubbleTextView bubbleTextView;
+
+        SentMessageHolder(View itemView) {
+            super(itemView);
+
+            bubbleTextView = (BubbleTextView) itemView.findViewById(R.id.idmessend);
+        }
+
+        void bind(QBChatMessage message) {
+            bubbleTextView.setText(message.getBody());
+        }
+    }
+
+    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
+        BubbleTextView bubbleTextView;
+
+        ReceivedMessageHolder(View itemView) {
+            super(itemView);
+
+            bubbleTextView = (BubbleTextView) itemView.findViewById(R.id.idmesreceive);
+        }
+
+        void bind(QBChatMessage message) {
+            bubbleTextView.setText(message.getBody());
+        }
     }
 }
