@@ -103,6 +103,7 @@ public class ListUserActivity extends AppCompatActivity {
         dialog.setName(Common.createChatDialogName(occupandIdsList));
         dialog.setType(QBDialogType.GROUP);
         dialog.setOccupantsIds(occupandIdsList);
+        dialog.setName("Group"+dialog.getDialogId().toString());
         QBRestChatService.createChatDialog(dialog).performAsync(new QBEntityCallback<QBChatDialog>() {
             @Override
             public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {

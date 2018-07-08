@@ -66,6 +66,7 @@ public class ChatMessageActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 contentMessage.setText("");
                 contentMessage.setFocusable(true);
+                scroolSmooth();
             }
         });
     }
@@ -74,6 +75,7 @@ public class ChatMessageActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         initChatDilalog();
+
     }
 
     private void retrieveMessages() {
@@ -93,7 +95,9 @@ public class ChatMessageActivity extends AppCompatActivity {
                     LinearLayoutManager layoutManager = new LinearLayoutManager(ChatMessageActivity.this);
                     adapter = new ChatMessageAdapter(ChatMessageActivity.this,qbChatMessagesArray);
                     lvChatting.setLayoutManager(layoutManager);
+
                     lvChatting.setAdapter(adapter);
+                    scroolSmooth();
                 }
 
                 @Override
@@ -107,7 +111,10 @@ public class ChatMessageActivity extends AppCompatActivity {
 
 
     }
-
+    private void scroolSmooth()
+    {
+        lvChatting.smoothScrollToPosition(adapter.getItemCount()-1);
+    }
     private void initChatDilalog() {
 
 
@@ -128,6 +135,7 @@ public class ChatMessageActivity extends AppCompatActivity {
             public void processMessage(String s, QBChatMessage qbChatMessage, Integer integer) {
                 qbChatMessagesArray.add(qbChatMessage);
                 adapter.notifyDataSetChanged();
+                scroolSmooth();
             }
 
             @Override

@@ -34,17 +34,12 @@
         android:hint="Enter your messages"
 
       />
-    <ListView
-        android:stackFromBottom="true"
-        android:id="@+id/lvChatMain"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_chat_messages"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="40dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="16dp">
-
-    </ListView>
+        />
 
 </RelativeLayout>
