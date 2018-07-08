@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.sang.chattingdemo.common.holder.QBUserHolder;
@@ -16,6 +17,8 @@ import com.quickblox.chat.model.QBChatMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatMessageAdapter extends RecyclerView.Adapter {
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
@@ -80,8 +83,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
                 break;
             case VIEW_TYPE_MESSAGE_RECEIVED:
                 ((ReceivedMessageHolder) holder).bind(mMessageList.get(position));
+               if (position>0) ((ReceivedMessageHolder) holder).check(position);
         }
     }
+
+
 
     private class SentMessageHolder extends RecyclerView.ViewHolder {
         BubbleTextView bubbleTextView;
@@ -99,15 +105,24 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
         BubbleTextView bubbleTextView;
-
+        CircleImageView userImage;
         ReceivedMessageHolder(View itemView) {
             super(itemView);
-
             bubbleTextView = (BubbleTextView) itemView.findViewById(R.id.idmesreceive);
+            userImage=(CircleImageView)itemView.findViewById(R.id.user_image);
         }
 
         void bind(QBChatMessage message) {
             bubbleTextView.setText(message.getBody());
+
+        }
+         void check(int position) {
+            if(position==0)
+                userImage.setVisibility(View.VISIBLE);
+            else
+            if (mMessageList.get(position-1).getSenderId().equals(userID))
+                    userImage.setVisibility(View.VISIBLE);
+
         }
     }
 }
