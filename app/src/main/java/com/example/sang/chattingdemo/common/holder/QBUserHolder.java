@@ -9,7 +9,7 @@ import java.util.List;
 
 public class QBUserHolder {
     private static QBUserHolder instance;
-    private SparseArray<QBUser> qbUserSparseArray;
+    public SparseArray<QBUser> qbUserSparseArray;
     public static synchronized QBUserHolder getInstance()
     {
         if(instance==null)
@@ -24,7 +24,7 @@ public class QBUserHolder {
     public void putUsers(List<QBUser> qbUsers)
     {
         for(QBUser qbUser:qbUsers)
-            putUser(qbUser);
+              putUser(qbUser);
     }
     public  void putUser(QBUser qbUser)
     {

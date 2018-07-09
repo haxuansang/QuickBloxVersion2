@@ -146,7 +146,6 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
 
             }
         });
-        qbChatDialog.addMessageListener(this);
 
         if (!qbChatDialog.getType().equals(QBDialogType.PRIVATE))
         {
@@ -165,6 +164,7 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
                 }
             });
         }
+        qbChatDialog.addMessageListener(this);
     }
 
     private void initView() {
