@@ -105,18 +105,22 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
         BubbleTextView bubbleTextView;
-        TextView userImage;
+        CircleImageView userImage;
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);
             bubbleTextView = (BubbleTextView) itemView.findViewById(R.id.idmesreceive);
-            userImage = (TextView) itemView.findViewById(R.id.user_image);
+            userImage = (CircleImageView) itemView.findViewById(R.id.user_image);
 
         }
 
         void bind(QBChatMessage message) {
             bubbleTextView.setText(message.getBody());
-            userImage.setText(QBUserHolder.getInstance().getUserById(message.getSenderId()).getFullName());
+            if(QBUserHolder.getInstance().getUserById(message.getSenderId()).getFullName().equals("Jake"))
+                userImage.setImageResource(R.drawable.userimage);
+            else if(QBUserHolder.getInstance().getUserById(message.getSenderId()).getFullName().equals("Wendy"))
+                 userImage.setImageResource(R.drawable.wendy);
+            else userImage.setImageResource(R.drawable.aden);
         }
 
     }
