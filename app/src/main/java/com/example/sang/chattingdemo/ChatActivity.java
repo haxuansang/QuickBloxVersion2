@@ -75,6 +75,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void createSessionForChat()
     {
+
         final ProgressDialog progressDialog  = new ProgressDialog(this);
         progressDialog.setMessage("Please Waiting...");
         progressDialog.setCanceledOnTouchOutside(false);
@@ -83,6 +84,8 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {
                 QBUserHolder.getInstance().putUsers(qbUsers);
+
+                Toast.makeText(ChatActivity.this, "Get user thanh cong"+ QBUserHolder.getInstance().qbUserSparseArray.size(), Toast.LENGTH_SHORT).show();
             }
 
             @Override

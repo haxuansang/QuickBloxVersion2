@@ -23,17 +23,19 @@ import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBChatDialogMessageListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.request.QBMessageGetBuilder;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatMessageActivity extends AppCompatActivity {
+public class ChatMessageActivity extends AppCompatActivity implements QBChatDialogMessageListener {
     QBChatDialog qbChatDialog;
     RecyclerView lvChatting;
     ImageButton btnsendMessage;
@@ -47,8 +49,8 @@ public class ChatMessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_message);
         initView();
         qbChatMessagesArray=new ArrayList<QBChatMessage>();
+        initChatDilalog();
         retrieveMessages();
-
 
         btnsendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,8 +64,10 @@ public class ChatMessageActivity extends AppCompatActivity {
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
                 }
-                qbChatMessagesArray.add(chatMessage);
-                adapter.notifyDataSetChanged();
+                if (qbChatDialog.getType().equals(QBDialogType.PRIVATE)) {
+                    qbChatMessagesArray.add(chatMessage);
+                    adapter.notifyDataSetChanged();
+                }
                 contentMessage.setText("");
                 contentMessage.setFocusable(true);
                 scroolSmooth();
@@ -74,13 +78,24 @@ public class ChatMessageActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        initChatDilalog();
+
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        qbChatDialog.removeMessageListrener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        qbChatDialog.removeMessageListrener(this);
+    }
+
     private void retrieveMessages() {
-        qbChatDialog=(QBChatDialog)getIntent().getSerializableExtra(Common.DIALOG_EXTRA);
-        qbChatDialog.initForChat(QBChatService.getInstance());
+
         QBMessageGetBuilder qbMessageGetBuilder = new QBMessageGetBuilder();
         qbMessageGetBuilder.setLimit(100);
         if(qbChatDialog!=null)
@@ -95,7 +110,6 @@ public class ChatMessageActivity extends AppCompatActivity {
                     LinearLayoutManager layoutManager = new LinearLayoutManager(ChatMessageActivity.this);
                     adapter = new ChatMessageAdapter(ChatMessageActivity.this,qbChatMessagesArray);
                     lvChatting.setLayoutManager(layoutManager);
-
                     lvChatting.setAdapter(adapter);
                     scroolSmooth();
                 }
@@ -107,17 +121,19 @@ public class ChatMessageActivity extends AppCompatActivity {
             });
         }
         else
-            Toast.makeText(this, "nulll roi", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "null roi", Toast.LENGTH_SHORT).show();
 
 
     }
     private void scroolSmooth()
     {
+        if(adapter.getItemCount()>0)
         lvChatting.smoothScrollToPosition(adapter.getItemCount()-1);
     }
     private void initChatDilalog() {
-
-
+        qbChatDialog=(QBChatDialog)getIntent().getSerializableExtra(Common.DIALOG_EXTRA);
+        Toast.makeText(this, ""+qbChatDialog.getDialogId(), Toast.LENGTH_SHORT).show();
+        qbChatDialog.initForChat(QBChatService.getInstance());
         QBIncomingMessagesManager incomingMessagesManager = QBChatService.getInstance().getIncomingMessagesManager();
         incomingMessagesManager.addDialogMessageListener(new QBChatDialogMessageListener() {
             @Override
@@ -130,19 +146,25 @@ public class ChatMessageActivity extends AppCompatActivity {
 
             }
         });
-        qbChatDialog.addMessageListener(new QBChatDialogMessageListener() {
-            @Override
-            public void processMessage(String s, QBChatMessage qbChatMessage, Integer integer) {
-                qbChatMessagesArray.add(qbChatMessage);
-                adapter.notifyDataSetChanged();
-                scroolSmooth();
-            }
+        qbChatDialog.addMessageListener(this);
 
-            @Override
-            public void processError(String s, QBChatException e, QBChatMessage qbChatMessage, Integer integer) {
-                Log.e("Error",e.getMessage());
-            }
-        });
+        if (!qbChatDialog.getType().equals(QBDialogType.PRIVATE))
+        {
+
+            DiscussionHistory discussionHistory = new DiscussionHistory();
+            discussionHistory.setMaxStanzas(0);
+            qbChatDialog.join(discussionHistory, new QBEntityCallback() {
+                @Override
+                public void onSuccess(Object o, Bundle bundle) {
+                    Toast.makeText(ChatMessageActivity.this, "Join Group Succesfully", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onError(QBResponseException e) {
+                    Toast.makeText(ChatMessageActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void initView() {
@@ -150,5 +172,17 @@ public class ChatMessageActivity extends AppCompatActivity {
         btnsendMessage = (ImageButton) findViewById(R.id.sendMessage);
         contentMessage =(EditText)findViewById(R.id.content_message);
 
+    }
+
+    @Override
+    public void processMessage(String s, QBChatMessage qbChatMessage, Integer integer) {
+        qbChatMessagesArray.add(qbChatMessage);
+        adapter.notifyDataSetChanged();
+        scroolSmooth();
+    }
+
+    @Override
+    public void processError(String s, QBChatException e, QBChatMessage qbChatMessage, Integer integer) {
+        Log.e("ErrorChatMessage",""+e.getMessage());
     }
 }

@@ -69,6 +69,7 @@ public class ListUserActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
                             progressDialog.dismiss();
+
                         Toast.makeText(ListUserActivity.this, "Create Private Successfully", Toast.LENGTH_SHORT).show();
                         finish();
                     }
@@ -99,6 +100,7 @@ public class ListUserActivity extends AppCompatActivity {
 
             }
         }
+        occupandIdsList.add(QBChatService.getInstance().getUser().getId());
         QBChatDialog dialog = new QBChatDialog();
         dialog.setName(Common.createChatDialogName(occupandIdsList));
         dialog.setType(QBDialogType.GROUP);

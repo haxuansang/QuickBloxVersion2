@@ -83,7 +83,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
                 break;
             case VIEW_TYPE_MESSAGE_RECEIVED:
                 ((ReceivedMessageHolder) holder).bind(mMessageList.get(position));
-               if (position>0) ((ReceivedMessageHolder) holder).check(position);
+
         }
     }
 
@@ -105,24 +105,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
         BubbleTextView bubbleTextView;
-        CircleImageView userImage;
+        TextView userImage;
+
         ReceivedMessageHolder(View itemView) {
             super(itemView);
             bubbleTextView = (BubbleTextView) itemView.findViewById(R.id.idmesreceive);
-            userImage=(CircleImageView)itemView.findViewById(R.id.user_image);
+            userImage = (TextView) itemView.findViewById(R.id.user_image);
+
         }
 
         void bind(QBChatMessage message) {
             bubbleTextView.setText(message.getBody());
-
+            userImage.setText(QBUserHolder.getInstance().getUserById(message.getSenderId()).getFullName());
         }
-         void check(int position) {
-            if(position==0)
-                userImage.setVisibility(View.VISIBLE);
-            else
-            if (mMessageList.get(position-1).getSenderId().equals(userID))
-                    userImage.setVisibility(View.VISIBLE);
 
-        }
     }
 }
