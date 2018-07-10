@@ -1,6 +1,11 @@
 package com.example.sang.chattingdemo;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +14,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 import com.example.sang.chattingdemo.common.Common;
 import com.example.sang.chattingdemo.common.holder.QBUserHolder;
@@ -22,17 +28,23 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import java.io.DataOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ListUserActivity extends AppCompatActivity {
     ListView listView;
     Button  btnCreateChat;
+    Button btnEditProfile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_user);
+
         listView=(ListView)findViewById(R.id.lvUsers);
         btnCreateChat=(Button)findViewById(R.id.btnSubmit);
+        btnEditProfile=(Button)findViewById(R.id.btnEditprofile);
+
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         retrieveAllUser();
         btnCreateChat.setOnClickListener(new View.OnClickListener() {
@@ -50,8 +62,17 @@ public class ListUserActivity extends AppCompatActivity {
                     Toast.makeText(ListUserActivity.this, "Please select friend for chatting!!!", Toast.LENGTH_SHORT).show();
             }
         });
-
+        btnEditProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //
+                Intent intent = new Intent(ListUserActivity.this,EditActivity.class);
+                startActivity(intent);
+            }
+        });
     }
+
+
 
     private void createPrivateChat(SparseBooleanArray checkedItemPositions) {
         final ProgressDialog progressDialog  = new ProgressDialog(this);

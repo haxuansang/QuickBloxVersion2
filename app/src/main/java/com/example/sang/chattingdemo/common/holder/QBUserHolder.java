@@ -2,6 +2,7 @@ package com.example.sang.chattingdemo.common.holder;
 
 import android.util.SparseArray;
 
+import com.quickblox.content.model.QBFile;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 public class QBUserHolder {
     private static QBUserHolder instance;
     public SparseArray<QBUser> qbUserSparseArray;
+
     public static synchronized QBUserHolder getInstance()
     {
         if(instance==null)
@@ -20,7 +22,9 @@ public class QBUserHolder {
     private QBUserHolder()
     {
         qbUserSparseArray = new SparseArray<>();
+
     }
+
     public void putUsers(List<QBUser> qbUsers)
     {
         for(QBUser qbUser:qbUsers)
@@ -31,6 +35,8 @@ public class QBUserHolder {
         qbUserSparseArray.put(qbUser.getId(),qbUser);
 
     }
+
+
     public QBUser getUserById(int i)
     {
         return qbUserSparseArray.get(i);
@@ -50,4 +56,5 @@ public class QBUserHolder {
         }
         return  qbUserList;
     }
+
 }

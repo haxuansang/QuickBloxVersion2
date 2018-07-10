@@ -34,6 +34,7 @@ public class ChatActivity extends AppCompatActivity {
     String username,password;
     FloatingActionButton btnAddChat;
     ListView lvChatting;
+    public static QBUser user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +108,7 @@ public class ChatActivity extends AppCompatActivity {
                 QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
                         @Override
                         public void onSuccess(Object o, Bundle bundle) {
+                            user=qbUser;
                             progressDialog.dismiss();
                         }
 

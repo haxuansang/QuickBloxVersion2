@@ -1,6 +1,11 @@
 package com.example.sang.chattingdemo;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -29,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         edtPassword=(EditText)findViewById(R.id.password);
         btnLogin=(Button)findViewById(R.id.login);
         btnRegister=(Button)findViewById(R.id.register);
+        Toast.makeText(this, ""+ Environment.getExternalStorageDirectory(), Toast.LENGTH_LONG).show();
+        requestRuntimePermission();
         QBSettings.getInstance().init(getApplicationContext(), APP_ID, AUTH_KEY, AUTH_SECRET);
         QBSettings.getInstance().setAccountKey(ACCOUNT_KEY);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -79,5 +86,31 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+    private void requestRuntimePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
+
+            {
+                requestPermissions(new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                },1000);
+            }
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode)
+        {
+            case 1000:
+                if(grantResults[0]==PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+
+        }
     }
 }

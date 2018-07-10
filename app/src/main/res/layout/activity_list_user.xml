@@ -11,8 +11,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Chat"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"/>
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="50dp"/>
+    <Button
+        android:id="@+id/btnEditprofile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/btnSubmit"
+        android:text="Edit Profile"
+        android:layout_marginLeft="40dp"/>
 
     <ListView
         android:layout_below="@id/btnSubmit"
