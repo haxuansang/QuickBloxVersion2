@@ -11,50 +11,58 @@ import java.util.List;
 public class QBUserHolder {
     private static QBUserHolder instance;
     public SparseArray<QBUser> qbUserSparseArray;
+    public List<QBUser> qbUsersList;
 
-    public static synchronized QBUserHolder getInstance()
-    {
-        if(instance==null)
+
+    public static synchronized QBUserHolder getInstance() {
+        if (instance == null)
             instance = new QBUserHolder();
         return instance;
 
     }
-    private QBUserHolder()
-    {
+
+    private QBUserHolder() {
         qbUserSparseArray = new SparseArray<>();
+        qbUsersList = new ArrayList<>();
 
     }
 
-    public void putUsers(List<QBUser> qbUsers)
-    {
-        for(QBUser qbUser:qbUsers)
-              putUser(qbUser);
-    }
-    public  void putUser(QBUser qbUser)
-    {
-        qbUserSparseArray.put(qbUser.getId(),qbUser);
+    public void putUsers(List<QBUser> qbUsers) {
+        for (QBUser qbUser : qbUsers)
+            putUser(qbUser);
 
     }
-
-
-    public QBUser getUserById(int i)
+    public void putListUsers(List<QBUser> qbUsers)
     {
+        qbUsersList=qbUsers;
+    }
+
+    public void putUser(QBUser qbUser) {
+        qbUserSparseArray.put(qbUser.getId(), qbUser);
+
+    }
+
+
+    public QBUser getUserById(int i) {
         return qbUserSparseArray.get(i);
 
     }
-    public List<QBUser> getUsersById(List<Integer> ids)
-    {
+
+    public List<QBUser> getUsersById(List<Integer> ids) {
         List<QBUser> qbUserList = new ArrayList<>();
-        for (Integer i :ids)
-        {
+        for (Integer i : ids) {
             QBUser user = getUserById(i);
-            if(user!=null)
-            {
+            if (user != null) {
                 qbUserList.add(user);
             }
 
         }
-        return  qbUserList;
+        return qbUserList;
+    }
+
+    public List<QBUser> getUsers()
+    {
+        return qbUsersList;
     }
 
 }

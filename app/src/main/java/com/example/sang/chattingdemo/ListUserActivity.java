@@ -104,6 +104,7 @@ public class ListUserActivity extends AppCompatActivity {
             }
         }
     }
+
     private void createGroupChat(SparseBooleanArray checkedItemPositions) {
 
         final ProgressDialog progressDialog  = new ProgressDialog(this);

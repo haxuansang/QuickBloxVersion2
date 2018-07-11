@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.sang.chattingdemo.common.holder.QBFileHolder;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
@@ -44,6 +45,7 @@ public class EditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
         imvEditImageUser=(CircleImageView)findViewById(R.id.edit_image_user);
+
         editProgress = new ProgressDialog(this);
         editProgress.setMessage("Loading Profile...");
         editProgress.show();
@@ -51,7 +53,6 @@ public class EditActivity extends AppCompatActivity {
         imvEditImageUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 pickIntent.setType("image/*");
                 startActivityForResult(Intent.createChooser(pickIntent,"Select Picture"),7171);
@@ -147,8 +148,8 @@ public class EditActivity extends AppCompatActivity {
                             QBUsers.updateUser(qbUser).performAsync(new QBEntityCallback<QBUser>() {
                                 @Override
                                 public void onSuccess(QBUser qbUser, Bundle bundle) {
-                                    imvEditImageUser.setImageBitmap(bitmap);
                                     progressDialog.dismiss();
+                                    imvEditImageUser.setImageBitmap(bitmap);
                                     Toast.makeText(EditActivity.this, "Update Image Successfully", Toast.LENGTH_SHORT).show();
                                 }
 
