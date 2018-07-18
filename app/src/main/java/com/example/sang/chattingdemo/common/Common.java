@@ -5,7 +5,6 @@ import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 public class Common {
      public static final String DIALOG_EXTRA="Dialogs";

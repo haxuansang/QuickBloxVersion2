@@ -2,22 +2,15 @@ package com.example.sang.chattingdemo;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-
-
 import com.example.sang.chattingdemo.common.Common;
-import com.example.sang.chattingdemo.common.holder.QBFileHolder;
 import com.example.sang.chattingdemo.common.holder.QBUserHolder;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.session.BaseService;
@@ -25,20 +18,14 @@ import com.quickblox.auth.session.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.model.QBChatDialog;
-import com.quickblox.content.QBContent;
-import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.request.QBRequestBuilder;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class ChatActivity extends AppCompatActivity {
     String username,password;

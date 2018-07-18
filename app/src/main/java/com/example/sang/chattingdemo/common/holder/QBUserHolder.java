@@ -12,7 +12,7 @@ import java.util.List;
 public class QBUserHolder {
     private static QBUserHolder instance;
     public SparseArray<QBUser> qbUserSparseArray;
-    public SparseArray<String> qbURLImagesUser;
+
 
 
     public static synchronized QBUserHolder getInstance() {
@@ -24,13 +24,9 @@ public class QBUserHolder {
 
     private QBUserHolder() {
         qbUserSparseArray = new SparseArray<>();
-        qbURLImagesUser=new SparseArray<>();
 
     }
-    public void putURL(int i,String URL)
-    {
-        qbURLImagesUser.put(i,URL);
-    }
+
     public List<Integer> getFileIDs()
     {
         List<Integer> fileIdsOfUsers = new ArrayList<>();
@@ -41,10 +37,7 @@ public class QBUserHolder {
         }
         return fileIdsOfUsers;
     }
-    public String getURLById(int i)
-    {
-        return qbURLImagesUser.get(i);
-    }
+
     public void putUsers(List<QBUser> qbUsers) {
         for (QBUser qbUser : qbUsers)
             putUser(qbUser);

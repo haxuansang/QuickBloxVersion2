@@ -1,29 +1,19 @@
 package com.example.sang.chattingdemo;
 
-import android.app.ProgressDialog;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sang.chattingdemo.common.Common;
-import com.example.sang.chattingdemo.common.holder.QBChatMessageHolder;
 import com.example.sang.chattingdemo.common.holder.QBFileHolder;
-import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBIncomingMessagesManager;
 import com.quickblox.chat.QBRestChatService;
@@ -33,20 +23,9 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.request.QBMessageGetBuilder;
-import com.quickblox.content.QBContent;
-import com.quickblox.content.model.QBFile;
-import com.quickblox.core.LogLevel;
 import com.quickblox.core.QBEntityCallback;
-import com.quickblox.core.QBHttpConnectionConfig;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.users.QBUsers;
-import com.quickblox.users.model.QBUser;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.util.ArrayList;
@@ -57,7 +36,7 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
     RecyclerView lvChatting;
     ImageButton btnsendMessage;
     TextView contentMessage;
-    ChatMessageAdapter adapter;
+    public static ChatMessageAdapter adapter;
     List<QBChatMessage> qbChatMessagesArray;
     public static RelativeLayout progressBar;
     public static RelativeLayout chatView;

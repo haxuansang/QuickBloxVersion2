@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
         edtPassword=(EditText)findViewById(R.id.password);
         btnLogin=(Button)findViewById(R.id.login);
         btnRegister=(Button)findViewById(R.id.register);
-        Toast.makeText(this, ""+ Environment.getExternalStorageDirectory(), Toast.LENGTH_LONG).show();
         requestRuntimePermission();
         QBSettings.getInstance().init(getApplicationContext(), APP_ID, AUTH_KEY, AUTH_SECRET);
         QBSettings.getInstance().setAccountKey(ACCOUNT_KEY);
@@ -47,14 +46,12 @@ public class MainActivity extends AppCompatActivity {
                 QBUsers.signIn(qbUser).performAsync(new QBEntityCallback<QBUser>() {
                     @Override
                     public void onSuccess(QBUser qbUser, Bundle bundle) {
-                        Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                         Bundle bundleUser= new Bundle();
                         bundleUser.putString("username",user);
                         bundleUser.putString("password",pass);
                         Intent intent = new Intent(MainActivity.this,ChatActivity.class);
                         intent.putExtra("PackageUser",bundleUser);
                         MainActivity.this.startActivity(intent);
-
 
                     }
 

@@ -5,11 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import com.example.sang.chattingdemo.R;
+import com.example.sang.chattingdemo.ChatMessageActivity;
 import com.example.sang.chattingdemo.common.holder.QBFileHolder;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -28,8 +26,10 @@ public class setImageToImageView {
 
 
                     if (QBFileHolder.getInstance().sizeOfImages()==3) {
+                        ChatMessageActivity.adapter.notifyDataSetChanged();
                         chatView.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
+
                     }
 
 

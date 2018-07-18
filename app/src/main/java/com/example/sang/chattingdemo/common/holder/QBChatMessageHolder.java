@@ -1,7 +1,6 @@
 package com.example.sang.chattingdemo.common.holder;
 
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
