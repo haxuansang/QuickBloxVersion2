@@ -5,7 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatMessageActivity">
+
+    <RelativeLayout
+        android:id="@+id/progress_download"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+    <ProgressBar
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+       />
+    </RelativeLayout>
+    <RelativeLayout
+
+        android:id="@+id/relative_layout_chatting"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        >
    <ImageButton
+
        android:id="@+id/emojiButton"
        android:background="@null"
        android:layout_width="40dp"
@@ -41,5 +61,5 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="40dp"
         />
-
+    </RelativeLayout>
 </RelativeLayout>

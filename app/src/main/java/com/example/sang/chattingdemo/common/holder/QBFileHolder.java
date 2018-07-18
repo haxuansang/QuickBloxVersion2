@@ -6,10 +6,12 @@ import android.util.SparseArray;
 import com.quickblox.content.model.QBFile;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 
 public class  QBFileHolder {
     private static QBFileHolder instance=null;
-    public HashMap<Integer,Bitmap> arrayImageUser;
+    public Hashtable<Integer,Bitmap> arrayImageUser;
+    public int count=0;
     public static synchronized QBFileHolder getInstance()
     {
         if(instance==null)
@@ -18,15 +20,23 @@ public class  QBFileHolder {
     }
     private QBFileHolder()
     {
-        arrayImageUser = new HashMap<>();
+        arrayImageUser = new Hashtable<>();
+
     }
     public void putQBFileUser(int idUser,Bitmap bitmap)
     {
         arrayImageUser.put(idUser,bitmap);
+        count++;
     }
+
     public Bitmap getFileUserById(int i)
     {
        return arrayImageUser.get(i);
     }
+    public int sizeOfImages()
+    {
+        return arrayImageUser.size();
+    }
+
 
 }

@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
 
 import com.example.sang.chattingdemo.common.Common;
 import com.example.sang.chattingdemo.common.holder.QBFileHolder;
@@ -42,8 +44,8 @@ public class ChatActivity extends AppCompatActivity {
     String username,password;
     FloatingActionButton btnAddChat;
     ListView lvChatting;
-    public static QBUser user;
-    public static List<QBUser> listOfUsers;
+
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,12 +54,12 @@ public class ChatActivity extends AppCompatActivity {
         Bundle bundleUser= intent.getBundleExtra("PackageUser");
         username=bundleUser.getString("username");
         password=bundleUser.getString("password");
-        listOfUsers= new ArrayList<>();
+        initConnectionTimeOut();
         btnAddChat=(FloatingActionButton)findViewById(R.id.addChatButton);
         lvChatting=(ListView)findViewById(R.id.lvChatting);
+        loadBitmapUsers();
         createSessionForChat();
         loadChatDialogs();
-        loadBitmapUsers();
         btnAddChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,65 +79,32 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
         loadChatDialogs();
 
-
     }
-
+    private void initConnectionTimeOut()
+    {
+        QBChatService.getInstance();
+        QBChatService.setDebugEnabled(true); // enable chat logging
+        QBChatService.setDefaultPacketReplyTimeout(10000);
+        QBChatService.ConfigurationBuilder chatServiceConfigurationBuilder = new QBChatService.ConfigurationBuilder();
+        chatServiceConfigurationBuilder.setSocketTimeout(600000); //Sets chat socket's read timeout in seconds
+        chatServiceConfigurationBuilder.setKeepAlive(true); //Sets connection socket's keepAlive option.
+        chatServiceConfigurationBuilder.setUseTls(true); //Sets the TLS security mode used when making the connection. By default TLS is disabled.
+        QBChatService.setConfigurationBuilder(chatServiceConfigurationBuilder);
+        QBChatService.getInstance().setReconnectionAllowed(true);
+    }
     private void createSessionForChat()
     {
 
-        final ProgressDialog progressDialog  = new ProgressDialog(this);
+        progressDialog  = new ProgressDialog(this);
         progressDialog.setMessage("Please Waiting...");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        QBUsers.getUsers(null).performAsync(new QBEntityCallback<ArrayList<QBUser>>() {
-            @Override
-            public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {
-
-                listOfUsers=qbUsers;
-
-               /* for (final QBUser qbUser:qbUsers) {
-                    QBUsers.getUser(qbUser.getId()).performAsync(new QBEntityCallback<QBUser>() {
-                        @Override
-                        public void onSuccess(final QBUser qbUser, Bundle bundle) {
-                            if (qbUser.getFileId()!=null)
-                            {
-
-                                QBContent.getFile(qbUser.getFileId()).performAsync(new QBEntityCallback<QBFile>() {
-                                    @Override
-                                    public void onSuccess(QBFile qbFile, Bundle bundle) {
-                                        Toast.makeText(ChatActivity.this, ""+qbFile.getPublicUrl()+"\t"+qbUser.getId(), Toast.LENGTH_SHORT).show();
-                                        QBFileHolder.getInstance().putQBFileUser(qbUser.getId(),qbFile.getPublicUrl());
-                                    }
-
-                                    @Override
-                                    public void onError(QBResponseException e) {
-                                        Toast.makeText(ChatActivity.this, ""+qbUser.getFullName()+"\t cannot download QBFile", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onError(QBResponseException e) {
-
-                        }
-                    });*/
-
-                Toast.makeText(ChatActivity.this, ""+listOfUsers.size(), Toast.LENGTH_SHORT).show();
-
-
-            }
-
-            @Override
-            public void onError(QBResponseException e) {
-
-            }
-        });
 
         final QBUser qbUser = new QBUser(username,password);
         QBAuth.createSession(qbUser).performAsync(new QBEntityCallback<QBSession>() {
@@ -151,14 +120,15 @@ public class ChatActivity extends AppCompatActivity {
                 QBChatService.getInstance().login(qbUser, new QBEntityCallback() {
                         @Override
                         public void onSuccess(Object o, Bundle bundle) {
-                            user=qbUser;
                             progressDialog.dismiss();
-                        }
+                            Toast.makeText(ChatActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
 
+                        }
 
                         @Override
                         public void onError(QBResponseException e) {
                             Log.e("Error",""+e.getMessage());
+                            Toast.makeText(ChatActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -173,65 +143,38 @@ public class ChatActivity extends AppCompatActivity {
     private  void loadBitmapUsers()
     {
 
-        for (int i=0;i<listOfUsers.size();i++)
+                QBUsers.getUsers(null).performAsync(new QBEntityCallback<ArrayList<QBUser>>() {
+                    @Override
+                    public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {
 
-        {
-            Toast.makeText(this, ""+listOfUsers.get(i).getId(), Toast.LENGTH_SHORT).show();
-             /*QBUsers.getUser(user.getId()).performAsync(new QBEntityCallback<QBUser>() {
-                 @Override
-                 public void onSuccess(final QBUser qbUser, Bundle bundle) {
-                     Toast.makeText(ChatActivity.this, ""+qbUser.getId(), Toast.LENGTH_SHORT).show();
-                     if(qbUser.getFileId()!=null)
-                     {
-                         QBContent.getFile(qbUser.getFileId()).performAsync(new QBEntityCallback<QBFile>() {
-                             @Override
-                             public void onSuccess(QBFile qbFile, Bundle bundle) {
-                                 Picasso.with(getBaseContext()).load(qbFile.getPublicUrl()).into(new Target() {
-                                     @Override
-                                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                                   QBFileHolder.getInstance().putQBFileUser(qbUser.getId(),bitmap);
-                                     }
+                        QBUserHolder.getInstance().putUsers(qbUsers);
 
-                                     @Override
-                                     public void onBitmapFailed(Drawable errorDrawable) {
+                    }
 
-                                     }
+                    @Override
+                    public void onError(QBResponseException e) {
 
-                                     @Override
-                                     public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    }
+                });
 
-                                     }
-                                 });
-                             }
 
-                             @Override
-                             public void onError(QBResponseException e) {
 
-                             }
-                         });
 
-                     }
-                 }
 
-                 @Override
-                 public void onError(QBResponseException e) {
-
-                 }
-             });*/
-        }
 
     }
+
+
     private  void loadChatDialogs()
     {
         QBRequestGetBuilder requestGetBuilder = new QBRequestGetBuilder();
-        requestGetBuilder.setLimit(100);
+        requestGetBuilder.setLimit(500);
         QBRestChatService.getChatDialogs(null,requestGetBuilder).performAsync(new QBEntityCallback<ArrayList<QBChatDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
                         ChatDialogsAdapter chatDialogsAdapter = new ChatDialogsAdapter(qbChatDialogs,ChatActivity.this);
                         lvChatting.setAdapter(chatDialogsAdapter);
                         chatDialogsAdapter.notifyDataSetChanged();
-
 
             }
 

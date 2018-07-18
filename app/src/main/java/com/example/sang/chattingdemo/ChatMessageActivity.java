@@ -1,6 +1,10 @@
 package com.example.sang.chattingdemo;
 
+import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,11 +15,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sang.chattingdemo.common.Common;
 import com.example.sang.chattingdemo.common.holder.QBChatMessageHolder;
+import com.example.sang.chattingdemo.common.holder.QBFileHolder;
+import com.quickblox.auth.session.QBSettings;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBIncomingMessagesManager;
 import com.quickblox.chat.QBRestChatService;
@@ -25,11 +33,20 @@ import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.request.QBMessageGetBuilder;
+import com.quickblox.content.QBContent;
+import com.quickblox.content.model.QBFile;
+import com.quickblox.core.LogLevel;
 import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.QBHttpConnectionConfig;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.util.ArrayList;
@@ -42,16 +59,19 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
     TextView contentMessage;
     ChatMessageAdapter adapter;
     List<QBChatMessage> qbChatMessagesArray;
+    public static RelativeLayout progressBar;
+    public static RelativeLayout chatView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_message);
         initView();
         qbChatMessagesArray=new ArrayList<QBChatMessage>();
+        qbChatDialog=(QBChatDialog)getIntent().getSerializableExtra(Common.DIALOG_EXTRA);
         initChatDilalog();
         retrieveMessages();
-
         btnsendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -64,47 +84,65 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
                 }
-                if (qbChatDialog.getType().equals(QBDialogType.PRIVATE)) {
+                if(qbChatDialog.getType()==QBDialogType.PRIVATE)
+                {
                     qbChatMessagesArray.add(chatMessage);
-                    adapter.notifyDataSetChanged();
                 }
+                adapter.notifyDataSetChanged();
                 contentMessage.setText("");
                 contentMessage.setFocusable(true);
                 scroolSmooth();
+
             }
         });
+    }
+
+
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("","onStart");
+        if(QBFileHolder.getInstance().sizeOfImages()>0) {
+            progressBar.setVisibility(View.GONE);
+            chatView.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-
+        Log.d("","onResume");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         qbChatDialog.removeMessageListrener(this);
+        Log.d("","onDestroy");
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         qbChatDialog.removeMessageListrener(this);
+        Log.d("","onStop");
     }
 
     private void retrieveMessages() {
 
         QBMessageGetBuilder qbMessageGetBuilder = new QBMessageGetBuilder();
-        qbMessageGetBuilder.setLimit(100);
+        qbMessageGetBuilder.setLimit(500);
         if(qbChatDialog!=null)
         {
             QBRestChatService.getDialogMessages(qbChatDialog,qbMessageGetBuilder).performAsync(new QBEntityCallback<ArrayList<QBChatMessage>>() {
                 @Override
                 public void onSuccess(ArrayList<QBChatMessage> qbChatMessages, Bundle bundle) {
                     for (QBChatMessage  qbChatMessage: qbChatMessages
-                         ) {
+                            ) {
                         qbChatMessagesArray.add(qbChatMessage);
                     }
                     LinearLayoutManager layoutManager = new LinearLayoutManager(ChatMessageActivity.this);
@@ -121,18 +159,18 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
             });
         }
         else
-            Toast.makeText(this, "null roi", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You couldn't connect with Group Chat, Please check anyway!!!", Toast.LENGTH_SHORT).show();
 
 
     }
     private void scroolSmooth()
     {
         if(adapter.getItemCount()>0)
-        lvChatting.smoothScrollToPosition(adapter.getItemCount()-1);
+            lvChatting.smoothScrollToPosition(adapter.getItemCount()-1);
     }
     private void initChatDilalog() {
-        qbChatDialog=(QBChatDialog)getIntent().getSerializableExtra(Common.DIALOG_EXTRA);
-        Toast.makeText(this, ""+qbChatDialog.getDialogId(), Toast.LENGTH_SHORT).show();
+
+
         qbChatDialog.initForChat(QBChatService.getInstance());
         QBIncomingMessagesManager incomingMessagesManager = QBChatService.getInstance().getIncomingMessagesManager();
         incomingMessagesManager.addDialogMessageListener(new QBChatDialogMessageListener() {
@@ -149,18 +187,17 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
 
         if (!qbChatDialog.getType().equals(QBDialogType.PRIVATE))
         {
-
             DiscussionHistory discussionHistory = new DiscussionHistory();
             discussionHistory.setMaxStanzas(0);
             qbChatDialog.join(discussionHistory, new QBEntityCallback() {
                 @Override
                 public void onSuccess(Object o, Bundle bundle) {
-                    Toast.makeText(ChatMessageActivity.this, "Join Group Succesfully", Toast.LENGTH_SHORT).show();
+
                 }
 
                 @Override
                 public void onError(QBResponseException e) {
-                    Toast.makeText(ChatMessageActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+
                 }
             });
         }
@@ -171,6 +208,10 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
         lvChatting = (RecyclerView) findViewById(R.id.list_chat_messages);
         btnsendMessage = (ImageButton) findViewById(R.id.sendMessage);
         contentMessage =(EditText)findViewById(R.id.content_message);
+        progressBar= (RelativeLayout) findViewById(R.id.progress_download);
+        chatView= (RelativeLayout) findViewById(R.id.relative_layout_chatting);
+
+
 
     }
 
