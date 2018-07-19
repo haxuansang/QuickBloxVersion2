@@ -52,28 +52,28 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
         initChatDilalog();
         retrieveMessages();
         btnsendMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                QBChatMessage chatMessage = new QBChatMessage();
-                chatMessage.setBody(contentMessage.getText().toString());
-                chatMessage.setSenderId(QBChatService.getInstance().getUser().getId());
-                chatMessage.setSaveToHistory(true);
-                try {
-                    qbChatDialog.sendMessage(chatMessage);
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
-                if(qbChatDialog.getType()==QBDialogType.PRIVATE)
-                {
-                    qbChatMessagesArray.add(chatMessage);
-                }
-                adapter.notifyDataSetChanged();
-                contentMessage.setText("");
-                contentMessage.setFocusable(true);
-                scroolSmooth();
+                @Override
+                public void onClick(View view) {
+                    QBChatMessage chatMessage = new QBChatMessage();
+                    chatMessage.setBody(contentMessage.getText().toString());
+                    chatMessage.setSenderId(QBChatService.getInstance().getUser().getId());
+                    chatMessage.setSaveToHistory(true);
+                    try {
+                        qbChatDialog.sendMessage(chatMessage);
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    }
+                    if(qbChatDialog.getType()==QBDialogType.PRIVATE)
+                    {
+                        qbChatMessagesArray.add(chatMessage);
+                    }
+                    adapter.notifyDataSetChanged();
+                    contentMessage.setText("");
+                    contentMessage.setFocusable(true);
+                    scroolSmooth();
 
-            }
-        });
+                }
+            });
     }
 
 
@@ -185,7 +185,7 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
 
     private void initView() {
         lvChatting = (RecyclerView) findViewById(R.id.list_chat_messages);
-        btnsendMessage = (ImageButton) findViewById(R.id.sendMessage);
+       btnsendMessage = (ImageButton) findViewById(R.id.sendMessage);
         contentMessage =(EditText)findViewById(R.id.content_message);
         progressBar= (RelativeLayout) findViewById(R.id.progress_download);
         chatView= (RelativeLayout) findViewById(R.id.relative_layout_chatting);

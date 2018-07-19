@@ -11,11 +11,13 @@
       android:id="@+id/username"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:text="haxuansang"
       />
    <EditText
        android:id="@+id/password"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content" />
+       android:layout_height="wrap_content"
+       android:text="anhsang123"/>
     <Button
         android:layout_gravity="center_horizontal"
         android:id="@+id/register"

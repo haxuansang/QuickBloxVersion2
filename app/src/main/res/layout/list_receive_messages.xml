@@ -29,9 +29,10 @@
             app:arrowPosition="14dp"
             app:arrowLocation="left"
             app:arrowCenter="true"
-            app:bubbleColor="#ff2342"
+            app:bubbleColor="@android:color/holo_blue_light"
             android:layout_marginEnd="150dp"
             android:layout_marginStart="10dp"
+
             />
     </RelativeLayout>
 </RelativeLayout>
